@@ -7,6 +7,7 @@ use App\Repository\TagRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: TagRepository::class)]
 #[ApiResource]
@@ -18,17 +19,17 @@ class Tag
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['projet:read'])]
     private ?string $nom = null;
 
     /**
-     * @var Collection<int, projet>
+     * @var Collection<int, Projet>
      */
-    #[ORM\ManyToMany(targetEntity: projet::class, inversedBy: 'tags')]
-    private Collection $Projet;
-
+    #[ORM\ManyToMany(targetEntity: Projet::class, mappedBy: 'tags')]
+    private Collection $projets;
     public function __construct()
     {
-        $this->projet = new ArrayCollection();
+        $this->projets = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -49,26 +50,10 @@ class Tag
     }
 
     /**
-     * @return Collection<int, projet>
+     * @return Collection<int, Projet>
      */
-    public function getProjet(): Collection
+    public function getProjets(): Collection
     {
-        return $this->projet;
-    }
-
-    public function addProjet(projet $projet): static
-    {
-        if (!$this->projet->contains($projet)) {
-            $this->projet->add($projet);
-        }
-
-        return $this;
-    }
-
-    public function removeProjet(projet $projet): static
-    {
-        $this->projet->removeElement($projet);
-
-        return $this;
+        return $this->projets;
     }
 }

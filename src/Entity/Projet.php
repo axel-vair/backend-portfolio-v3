@@ -7,30 +7,40 @@ use App\Repository\ProjetRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ProjetRepository::class)]
-#[ApiResource]
+#[ApiResource(normalizationContext: ['groups' => ['projet:read']])]
 class Projet
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['projet:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['projet:read'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['projet:read'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['projet:read'])]
     private ?string $lien = null;
 
     /**
      * @var Collection<int, Tag>
      */
-    #[ORM\ManyToMany(targetEntity: Tag::class, mappedBy: 'Projet')]
+    #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'projets')]
+    #[Groups(['projet:read'])]
     private Collection $tags;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['projet:read'])]
+    private ?string $image = null;
 
     public function __construct()
     {
@@ -90,7 +100,6 @@ class Projet
     {
         if (!$this->tags->contains($tag)) {
             $this->tags->add($tag);
-            $tag->addProjet($this);
         }
 
         return $this;
@@ -98,10 +107,20 @@ class Projet
 
     public function removeTag(Tag $tag): static
     {
-        if ($this->tags->removeElement($tag)) {
-            $tag->removeProjet($this);
-        }
+        $this->tags->removeElement($tag);
 
         return $this;
     }
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): static
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
 }
