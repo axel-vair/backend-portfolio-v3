@@ -6,9 +6,11 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ArticleRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Vich\UploaderBundle\Mapping\Attribute\Uploadable;
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
 #[ApiResource]
+#[Uploadable]
 class Article
 {
     #[ORM\Id]
@@ -24,6 +26,12 @@ class Article
 
     #[ORM\Column]
     private ?\DateTime $datePublication = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $image = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $chapeau = null;
 
     public function getId(): ?int
     {
@@ -62,6 +70,30 @@ class Article
     public function setDatePublication(\DateTime $datePublication): static
     {
         $this->datePublication = $datePublication;
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): static
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    public function getChapeau(): ?string
+    {
+        return $this->chapeau;
+    }
+
+    public function setChapeau(string $chapeau): static
+    {
+        $this->chapeau = $chapeau;
 
         return $this;
     }

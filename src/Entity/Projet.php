@@ -10,7 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ProjetRepository::class)]
-#[ApiResource(normalizationContext: ['groups' => ['projet:read']])]
+#[ApiResource(normalizationContext: ['groups' => ['projet:read', 'media_object:read']])]
+
 class Projet
 {
     #[ORM\Id]
@@ -38,9 +39,10 @@ class Projet
     #[Groups(['projet:read'])]
     private Collection $tags;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\ManyToOne(targetEntity: MediaObject::class)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups(['projet:read'])]
-    private ?string $image = null;
+    private ?MediaObject $image = null;
 
     public function __construct()
     {
@@ -111,12 +113,12 @@ class Projet
 
         return $this;
     }
-    public function getImage(): ?string
+    public function getImage(): ?MediaObject
     {
         return $this->image;
     }
 
-    public function setImage(?string $image): static
+    public function setImage(?MediaObject $image): static
     {
         $this->image = $image;
 
